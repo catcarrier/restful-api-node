@@ -7,7 +7,13 @@ const mongoose = require('mongoose');
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 
+mongoose.connect(
+    'mongodb://localhost:27017/node-shop', {
+         //useMongoClient:true
+     })
+
 // middleware - handle requests
+
 
 // log basic request stats to console
 app.use(morgan('dev'));
