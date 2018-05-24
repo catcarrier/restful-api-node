@@ -50,8 +50,6 @@ router.get('/:productId', (req, res, next) => {
             } else {
                 res.status(404).json({ message: "Not found" });
             }
-
-
         })
         .catch(err => {
             console.log(err);
