@@ -6,14 +6,15 @@ const Product = require('../models/product');
 
 router.get('/', (req, res, next) => {
     Order.find()
-        .select('_id quantity productId')
+        .select('_id quantity product')
+        .populate('product', 'name')
         .exec()
         .then(docs => {
             res.status(200).json({
                 count: docs.length,
                 orders: docs.map(doc => {
                     return {
-                        productId: doc.productId,
+                        product: doc.product,
                         quantity: doc.quantity,
                         _id: doc._id,
                         request: {
@@ -30,7 +31,8 @@ router.get('/', (req, res, next) => {
 
 router.get('/:orderId', (req, res, next) => {
     Order.findById(req.params.orderId)
-        .select('_id productId quantity')
+        .select('_id product quantity')
+        .populate('product', 'name') /* product is a reference type; returns the object behind the reference */
         .exec()
         .then(order => {
             if (!order) {
@@ -50,7 +52,7 @@ router.get('/:orderId', (req, res, next) => {
 router.post('/', (req, res, next) => {
 
     // confirm the product exists
-    Product.findById(req.body.productId)
+    Product.findById(req.body.product)
         .then(product => {
             if (!product) {
                 return res.status(404).json({
@@ -59,7 +61,7 @@ router.post('/', (req, res, next) => {
             }
             const order = new Order({
                 _id: mongoose.Types.ObjectId() /* generate an id*/,
-                productId: req.body.productId,
+                product: req.body.product,
                 quantity: req.body.quantity
             });
             return order.save()
@@ -68,7 +70,7 @@ router.post('/', (req, res, next) => {
                         message: 'Order created',
                         order: {
                             _id: result._id,
-                            productId: result.productId,
+                            product: result.product,
                             quantity: result.quantity,
                             request: {
                                 type: 'GET',
